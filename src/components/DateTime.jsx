@@ -1,16 +1,29 @@
-import React from "react";
-import CurrentDate from "./Time components/CurrentDate";
-import CurrentTime from "./Time components/CurrentTime";
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
 
-const DateTime = () => {
-  const date = new Date(); // Create a single Date object to be shared
+const DateTime = ({ date, updateDate }) => {
+  // Використовуємо useEffect для оновлення дати кожну секунду
+  useEffect(() => {
+    const interval = setInterval(updateDate, 1000); // Оновлюємо дату кожну секунду
+    return () => clearInterval(interval); // Очищуємо інтервал при розмонтуванні
+  }, [updateDate]);
 
   return (
-    <div style={{ color: "#fff" }}>
-      <CurrentDate date={date} />
-      <CurrentTime date={date} />
+    <div>
+      <p>{date.toLocaleString()}</p> {/* Відображаємо дату у форматі локалі */}
     </div>
   );
 };
 
-export default DateTime;
+// Функція для отримання даних з Redux
+const mapStateToProps = (state) => ({
+  date: state.date.date,
+});
+
+// Функція для оновлення дати
+const mapDispatchToProps = (dispatch) => ({
+  updateDate: () => dispatch({ type: 'UPDATE_DATE', payload: new Date() }),
+});
+
+// Підключення компонента до Redux
+export default connect(mapStateToProps, mapDispatchToProps)(DateTime);
